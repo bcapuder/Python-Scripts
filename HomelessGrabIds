@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jun 24 09:33:19 2014
+
+@author: bcapuder
+
+this script grabs a unique list of ids from homelessshelterdirectory.org
+the first state was just copy pasting cities in each state into a csv to get
+urls for each cities look up page--each page had a variable number of shelters
+this script picks out the ids from the urls and creates a unique list and saves 
+them to a text file
+"""
+from bs4 import BeautifulSoup
+from urllib import urlopen
+import pandas as pd
+#opens csv with city urls
+df = pd.read_csv('C:\Users\User\Documents\citieshomelessref.csv')
+#creates file to be written to
+f = open('C:\Users\User\Documents\Keyall.txt','w')
+#initializes list of unique keys
+keyTotal = ["Key"]
+for i in range(len(df)):
+    #reads webpage of url
+    webpage = urlopen(df.URL[i]).read()
+    #creates a beautiful soup of url
+    soup = BeautifulSoup(webpage)
+    #finds all a-tags in soup and stores in list (sAll)
+    sAll = soup.findAll('a')
+    #iterates through each link in sAll
+    for link in sAll:
+        #tests if link has a shelter id in it and if that id is not in keyTotal yet
+        if "shelter=" in str(link) and str(link)[str(link).find('shelter=')+8:str(link).find('><b>')-1] not in keyTotal:
+            #adds key to list
+            keyTotal.append(str(link)[str(link).find('shelter=')+8:str(link).find('><b>')-1])
+#writes key to file
+for key in keyTotal:
+    f.write(str(key).strip()+'\n')
+#closes file
+f.close()
+
